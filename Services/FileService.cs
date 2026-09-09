@@ -7,6 +7,32 @@ public class FileService(IWebHostEnvironment webHostEnvironment, ApplicationDbCo
 
     public async Task<Guid> UploadAsync(IFormFile file, CancellationToken ct)
     {
+        var uploadedFile = await SaveFile(file, ct);
+
+        await _context.Files.AddAsync(uploadedFile, cancellationToken: ct);
+        await _context.SaveChangesAsync(ct);
+
+        return uploadedFile.Id;
+    }
+
+    public async Task<IEnumerable<Guid>> UploadMultipleAsync(IFormFileCollection files, CancellationToken ct)
+    {
+        List<UploadedFile> uploadedFiles = [];
+
+        foreach (var file in files)
+        {
+            var uploadedFile = await SaveFile(file, ct);
+            uploadedFiles.Add(uploadedFile);
+        }
+
+        await _context.Files.AddRangeAsync(uploadedFiles, ct);
+        await _context.SaveChangesAsync(ct);
+
+        return uploadedFiles.Select(x => x.Id);
+    }
+
+    private async Task<UploadedFile> SaveFile(IFormFile file, CancellationToken ct)
+    {
         var randomFileName = Path.GetRandomFileName();
 
         var uploadedFile = new UploadedFile
@@ -22,9 +48,6 @@ public class FileService(IWebHostEnvironment webHostEnvironment, ApplicationDbCo
         using var stream = File.Create(path);
         await file.CopyToAsync(stream, ct);
 
-        await _context.Files.AddAsync(uploadedFile, cancellationToken: ct);
-        await _context.SaveChangesAsync(ct);
-
-        return uploadedFile.Id;
+        return uploadedFile;
     }
 }

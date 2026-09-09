@@ -12,8 +12,15 @@ public class FilesController(IFileService fileService) : ControllerBase
     public async Task<IActionResult> Upload([FromForm] UploadFileRequest request, CancellationToken ct)
     {
         var fileId = await _fileService.UploadAsync(request.File, ct);
-        Console.WriteLine("Hello, World!");
 
-        return Created();
+        return Ok(fileId);
+    }
+
+    [HttpPost("upload-multiple")]
+    public async Task<IActionResult> UploadMultiple([FromForm] UploadMultipleFilesRequest request, CancellationToken ct)
+    {
+        var fileIds = await _fileService.UploadMultipleAsync(request.Files, ct);
+
+        return Ok(fileIds);
     }
 }
