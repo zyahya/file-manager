@@ -7,4 +7,6 @@ public interface IFileService
     Task<IEnumerable<Guid>> UploadMultipleAsync(IFormFileCollection files, CancellationToken ct = default);
 
     Task UploadImageAsync(IFormFile image, CancellationToken ct = default);
+
+    Task<(byte[] fileContent, string contentType, string fileName)> DownloadAsync(Guid id, CancellationToken ct = default);
 }

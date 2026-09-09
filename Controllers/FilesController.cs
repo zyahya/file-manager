@@ -13,7 +13,7 @@ public class FilesController(IFileService fileService) : ControllerBase
     {
         var fileId = await _fileService.UploadAsync(request.File, ct);
 
-        return Ok(fileId);
+        return CreatedAtAction(nameof(Download), new { id = fileId }, null);
     }
 
     [HttpPost("upload-multiple")]
@@ -30,5 +30,13 @@ public class FilesController(IFileService fileService) : ControllerBase
         await _fileService.UploadImageAsync(request.Image, ct);
 
         return Created();
+    }
+
+    [HttpGet("download/{id}")]
+    public async Task<IActionResult> Download(Guid id, CancellationToken ct)
+    {
+        var (fileContent, contentType, fileName) = await _fileService.DownloadAsync(id, ct);
+
+        return fileContent is [] ? NotFound() : File(fileContent, contentType, fileName);
     }
 }

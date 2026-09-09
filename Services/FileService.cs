@@ -64,4 +64,28 @@ public class FileService(IWebHostEnvironment webHostEnvironment, ApplicationDbCo
     {
         return file.Replace(" ", "_");
     }
+
+    public async Task<(byte[] fileContent, string contentType, string fileName)> DownloadAsync(Guid id, CancellationToken ct = default)
+    {
+        // TODO: Why the second one complains?
+        // Valid:   var file = await _context.Files.FindAsync(new object?[] { id }, cancellationToken: ct);
+        // Invalid: var file = await _context.Files.FindAsync(id, cancellationToken: ct);
+
+        var file = await _context.Files.FindAsync(id);
+
+        if (file == null)
+        {
+            return ([], string.Empty, string.Empty);
+        }
+
+        var path = Path.Combine(_filesPath, file.StoredFileName);
+
+        var memoryStream = new MemoryStream();
+        using var fileStream = new FileStream(path, FileMode.Open);
+        fileStream.CopyTo(memoryStream);
+
+        memoryStream.Position = 0;
+
+        return (memoryStream.ToArray(), file.ContentType, file.FileName);
+    }
 }
