@@ -1,8 +1,7 @@
-using FileManager.Contracts;
 using FileManager.Settings;
 using FluentValidation;
 
-namespace FileManager.Validators;
+namespace FileManager.Contracts;
 
 public class UploadFileRequestValidator : AbstractValidator<UploadFileRequest>
 {
