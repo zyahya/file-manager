@@ -1,5 +1,7 @@
 wwwroot/uploads/*
 !wwwroot/uploads/.gitkeep
+wwwroot/images/*
+!wwwroot/images/.gitkeep
 .vscode/
 
 *.swp
